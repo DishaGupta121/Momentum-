@@ -7,10 +7,7 @@ A lightweight, mobile-first habit tracker built around one simple belief:
 Momentum helps users build sustainable habits by reducing onboarding friction, encouraging tiny daily actions, and rewarding consistency instead of perfection. Through a forgiving streak system, visual progress indicators, and milestone-based motivation, the product creates an experience that keeps users engaged during the most critical stage of habit formation—the first seven days.
 
 ---
-
-## 🚀 Live Demo
-
-**🔗 Live Prototype:** **[View Momentum Prototype](https://dishagupta121.github.io/Momentum-/)**
+## Demo Link - [Live Prototype](https://dishagupta121.github.io/Momentum-/)
 
 ---
 
