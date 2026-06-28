@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#F2F1F9" />
+<title>Momentum — small days, real momentum</title>
+<meta name="description" content="Momentum is a habit tracker built around your first seven days. Start tiny, get one gentle nudge, and watch your week charge up — with forgiving streaks that survive an off day." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   MOMENTUM — "Electric Calm" design tokens
+   Building a habit is momentum: small motion that heats up.
+   Boldness spent on ONE signature — the charging Momentum Ring
+   (cool iris -> hot ember). Cyan reserved only for "freeze".
+   ============================================================ */
+:root{
+  --cloud:#F2F1F9;        /* app background, cool lavender-white */
+  --cloud-2:#FAFAFE;      /* faint lift */
+  --surface:#FFFFFF;      /* cards */
+  --ink:#181530;          /* deep iris-black, text */
+  --ink-2:#58536F;        /* secondary text */
+  --ink-3:#9893B0;        /* tertiary / placeholders */
+  --line:#E4E1F2;         /* hairlines / borders / empty track */
+  --line-2:#EEECF8;       /* softer fills */
+  --iris:#5B45F0;         /* primary — electric indigo-violet */
+  --iris-deep:#4733C7;    /* pressed / emphasis */
+  --iris-wash:#ECE9FE;    /* pale violet surface */
+  --ember:#FF6A3D;        /* momentum + celebration (warm) */
+  --ember-deep:#E8501F;
+  --ember-soft:#FFE3D6;
+  --glacier:#1FA9E0;      /* freeze only */
+  --glacier-soft:#D8EEF9;
+  --shadow:0 1px 2px rgba(24,21,48,.05), 0 10px 28px rgba(24,21,48,.07);
+  --shadow-lg:0 18px 50px rgba(24,21,48,.20);
+  --shadow-iris:0 8px 22px rgba(91,69,240,.30);
+  --shadow-ember:0 8px 22px rgba(255,106,61,.32);
+  --r-sm:12px; --r:18px; --r-lg:24px; --r-xl:30px; --r-pill:999px;
+  --display:"Space Grotesk",ui-sans-serif,system-ui,sans-serif;
+  --sans:"Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --app-w:412px;
+  --app-h:926px;
+  --ease:cubic-bezier(.21,.7,.32,1);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:var(--sans);
+  color:var(--ink);
+  background:
+    radial-gradient(1100px 640px at 50% -240px, #E9E6FA 0%, var(--cloud) 58%),
+    var(--cloud);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  min-height:100%;
+  display:flex; align-items:center; justify-content:center;
+  padding:30px 16px;
+  overflow-x:hidden;
+}
+
+/* ---------- phone frame (desktop) / full-bleed (mobile) ---------- */
+.stage{ width:100%; display:flex; flex-direction:column; align-items:center; gap:14px; }
+.frame{
+  width:var(--app-w); height:var(--app-h);
+  max-height:calc(100dvh - 24px);
+  background:linear-gradient(160deg,#26213F,#15122A);
+  border-radius:48px; padding:10px;
+  box-shadow:var(--shadow-lg), 0 0 0 2px rgba(24,21,48,.10);
+  position:relative; isolation:isolate;
+}
+.frame::after{ /* side button */
+  content:""; position:absolute; right:-3px; top:172px; width:3px; height:58px;
+  background:rgba(24,21,48,.22); border-radius:3px;
+}
+.screen{
+  position:relative; width:100%; height:100%;
+  background:var(--cloud); border-radius:39px; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+.island{
+  position:absolute; top:11px; left:50%; transform:translateX(-50%);
+  width:112px; height:30px; background:#0D0B1C; border-radius:var(--r-pill);
+  z-index:60;
+}
+
+/* scrollable app body */
+.view{ flex:1; overflow-y:auto; overflow-x:hidden; -webkit-overflow-scrolling:touch; position:relative; }
+.view::-webkit-scrollbar{ width:0 }
+.pad{ padding:52px 22px 24px; }
+
+/* ---------- type helpers ---------- */
+.eyebrow{ font-family:var(--sans); font-size:11px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:var(--iris); }
+.display{ font-family:var(--display); }
+h1,h2,h3{ font-family:var(--display); font-weight:600; line-height:1.06; letter-spacing:-.02em; color:var(--ink); }
+.title{ font-size:30px; }
+.subtitle{ font-size:15px; color:var(--ink-2); line-height:1.5; font-weight:400; }
+
+/* ---------- buttons ---------- */
+.btn{
+  font-family:var(--sans); font-weight:700; font-size:16px;
+  border:none; border-radius:var(--r-pill); cursor:pointer;
+  padding:16px 22px; width:100%;
+  display:inline-flex; align-items:center; justify-content:center; gap:9px;
+  transition:transform .16s var(--ease), box-shadow .2s var(--ease), background .2s, color .2s;
+  min-height:54px; letter-spacing:-.01em;
+}
+.btn:active{ transform:scale(.977) }
+.btn-primary{ background:var(--iris); color:#fff; box-shadow:var(--shadow-iris); }
+.btn-primary:hover{ background:var(--iris-deep) }
+.btn-ember{ background:var(--ember); color:#fff; box-shadow:var(--shadow-ember); }
+.btn-ember:hover{ background:var(--ember-deep) }
+.btn-soft{ background:var(--iris-wash); color:var(--iris-deep); }
+.btn-soft:hover{ background:#E1DCFD }
+.btn-ghost{ background:transparent; color:var(--ink-2); min-height:46px; padding:12px; font-weight:600; }
+.btn-ghost:hover{ color:var(--ink) }
+.btn-row{ display:flex; gap:10px; }
+.btn-row .btn{ flex:1 }
+
+:focus-visible{ outline:3px solid var(--ember); outline-offset:2px; border-radius:8px; }
+
+/* ============================================================ */
+/* WELCOME                                                       */
+/* ============================================================ */
+.welcome{ height:100%; display:flex; flex-direction:column; justify-content:space-between;
+  padding:60px 28px 32px; text-align:left;
+  background:
+    radial-gradient(120% 64% at 78% -6%, rgba(255,106,61,.16) 0%, rgba(255,106,61,0) 48%),
+    radial-gradient(120% 60% at 6% 8%, rgba(91,69,240,.16) 0%, rgba(91,69,240,0) 50%),
+    linear-gradient(180deg, var(--cloud-2), var(--cloud) 64%);
+}
+.brandmark{ display:flex; align-items:center; gap:11px; }
+.brand-name{ font-family:var(--display); font-size:21px; font-weight:700; letter-spacing:-.02em; }
+.welcome-ring{ margin:auto auto 8px; }
+.welcome-hero h1{ font-size:42px; line-height:1.03; font-weight:600; letter-spacing:-.03em; }
+.welcome-hero h1 em{ font-style:normal; color:var(--iris); }
+.welcome-hero p{ margin-top:16px; font-size:16px; color:var(--ink-2); line-height:1.55; max-width:30ch; }
+.welcome-foot{ font-size:12.5px; color:var(--ink-3); text-align:center; margin-top:13px; font-weight:500; }
+
+/* ============================================================ */
+/* ONBOARDING                                                    */
+/* ============================================================ */
+.ob-top{ padding:48px 22px 6px; }
+.steps{ display:flex; gap:6px; margin-bottom:22px; }
+.steps i{ height:5px; border-radius:5px; flex:1; background:var(--line); transition:background .3s; }
+.steps i.on{ background:var(--iris) }
+.steps i.done{ background:var(--iris-deep) }
+.ob-q{ font-size:27px; margin-bottom:7px; }
+.ob-sub{ font-size:14.5px; color:var(--ink-2); line-height:1.5; }
+
+/* template list */
+.templates{ padding:16px 22px 0; display:flex; flex-direction:column; gap:10px; }
+.tmpl{
+  display:flex; align-items:center; gap:14px; width:100%; text-align:left;
+  background:var(--surface); border:1.5px solid var(--line); border-radius:var(--r);
+  padding:14px 15px; cursor:pointer;
+  transition:border-color .18s, background .18s, transform .12s var(--ease), box-shadow .18s;
+}
+.tmpl:hover{ border-color:var(--iris); box-shadow:var(--shadow) }
+.tmpl:active{ transform:scale(.99) }
+.tmpl.sel{ border-color:var(--iris); background:var(--iris-wash); box-shadow:0 0 0 3px rgba(91,69,240,.14) }
+.tmpl-ic{ width:42px; height:42px; flex:none; border-radius:13px; background:var(--iris-wash);
+  display:grid; place-items:center; color:var(--iris); transition:.18s; }
+.tmpl.sel .tmpl-ic{ background:#fff }
+.tmpl-tx b{ display:block; font-size:15.5px; font-weight:700; color:var(--ink); }
+.tmpl-tx span{ font-size:13px; color:var(--ink-2); }
+.tmpl-check{ margin-left:auto; color:var(--iris); opacity:0; transform:scale(.6); transition:.18s var(--ease) }
+.tmpl.sel .tmpl-check{ opacity:1; transform:scale(1) }
+
+/* fields */
+.field{ margin-top:18px; }
+.field label{ display:block; font-size:13px; font-weight:700; color:var(--ink-2); margin-bottom:7px; }
+.input{
+  width:100%; font-family:var(--sans); font-size:16px; font-weight:500; color:var(--ink);
+  background:var(--surface); border:1.5px solid var(--line); border-radius:var(--r-sm);
+  padding:14px; transition:border-color .18s, box-shadow .18s;
+}
+.input::placeholder{ color:var(--ink-3); font-weight:400 }
+.input:focus{ outline:none; border-color:var(--iris); box-shadow:0 0 0 3px rgba(91,69,240,.16) }
+
+.tiny-card{ margin-top:16px; background:linear-gradient(150deg,var(--iris-wash),var(--cloud-2));
+  border:1.5px solid var(--line-2); border-radius:var(--r); padding:16px 17px; }
+.tiny-card .lab{ font-size:11px; font-weight:700; letter-spacing:.13em; text-transform:uppercase; color:var(--iris); }
+.tiny-card .big{ font-family:var(--display); font-size:22px; font-weight:600; margin-top:6px; line-height:1.16; letter-spacing:-.02em; }
+.tiny-card .why{ font-size:12.5px; color:var(--ink-2); margin-top:10px; line-height:1.45; display:flex; gap:7px; align-items:flex-start; }
+.tiny-card .why svg{ color:var(--ember); flex:none; margin-top:1px }
+
+.chip-row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+.chip{ font-family:var(--sans); font-size:13px; font-weight:600; color:var(--iris-deep);
+  background:var(--iris-wash); border:1.5px solid transparent; border-radius:var(--r-pill);
+  padding:9px 14px; cursor:pointer; transition:.16s }
+.chip:hover{ background:#E1DCFD }
+.chip.sel{ background:#fff; border-color:var(--iris); color:var(--ink) }
+
+/* reminder step */
+.rem-card{ margin-top:8px; background:var(--surface); border:1.5px solid var(--line);
+  border-radius:var(--r); overflow:hidden; }
+.rem-row{ display:flex; align-items:center; gap:13px; padding:16px; }
+.rem-row + .rem-row{ border-top:1.5px solid var(--line-2) }
+.rem-ic{ width:40px; height:40px; border-radius:12px; background:var(--iris-wash); display:grid; place-items:center; color:var(--iris); flex:none }
+.rem-tx{ flex:1 }
+.rem-tx b{ display:block; font-size:15px; font-weight:700 }
+.rem-tx span{ font-size:12.5px; color:var(--ink-2) }
+.time-input{ font-family:var(--display); font-weight:600; font-size:15px; color:var(--iris-deep);
+  background:var(--iris-wash); border:none; border-radius:var(--r-sm); padding:9px 12px; cursor:pointer }
+.time-input:focus{ outline:none; box-shadow:0 0 0 3px rgba(91,69,240,.22) }
+
+/* iOS-style switch */
+.switch{ position:relative; width:50px; height:30px; flex:none; cursor:pointer }
+.switch input{ position:absolute; opacity:0; width:100%; height:100%; margin:0; cursor:pointer }
+.switch .track{ position:absolute; inset:0; background:var(--line); border-radius:var(--r-pill); transition:background .22s }
+.switch .knob{ position:absolute; top:3px; left:3px; width:24px; height:24px; background:#fff; border-radius:50%;
+  box-shadow:0 1px 3px rgba(0,0,0,.22); transition:transform .22s var(--ease) }
+.switch input:checked + .track{ background:var(--iris) }
+.switch input:checked + .track + .knob{ transform:translateX(20px) }
+.rem-note{ font-size:12px; color:var(--ink-3); line-height:1.45; margin:14px 4px 0; display:flex; gap:7px; align-items:flex-start }
+.rem-note svg{ flex:none; margin-top:1px }
+
+/* sticky onboarding footer */
+.ob-foot{ padding:14px 22px calc(20px + env(safe-area-inset-bottom));
+  background:linear-gradient(180deg, rgba(242,241,249,0), var(--cloud) 36%); }
+
+/* first-log moment */
+.firstwin-wrap .ob-foot{ padding-top:18px }
+
+/* ============================================================ */
+/* APP — HOME / TODAY                                            */
+/* ============================================================ */
+.app-head{ padding:50px 22px 4px; display:flex; align-items:flex-start; justify-content:space-between; gap:12px }
+.app-head .hello .eyebrow{ margin-bottom:3px; color:var(--ink-3) }
+.app-head .hello h2{ font-size:24px }
+.icon-btn{ width:42px; height:42px; border-radius:50%; border:1.5px solid var(--line); background:var(--surface);
+  display:grid; place-items:center; cursor:pointer; color:var(--ink-2); transition:.16s; flex:none }
+.icon-btn:hover{ border-color:var(--iris); color:var(--iris) }
+
+/* ---- THE SIGNATURE: Momentum Ring ---- */
+.ring-wrap{ position:relative; display:grid; place-items:center; }
+.ring-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+.ring-flame{ color:var(--ember); height:22px; margin-bottom:-2px; filter:drop-shadow(0 2px 5px rgba(255,106,61,.4)); }
+.ring-num{ font-family:var(--display); font-weight:600; line-height:.92; letter-spacing:-.04em; color:var(--ink); }
+.ring-cap{ font-size:8.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-3); margin-top:3px }
+.ring-glyph{ color:var(--iris) }
+.seg-today{ animation:breathe 2.4s ease-in-out infinite }
+@keyframes breathe{ 0%,100%{opacity:.5} 50%{opacity:1} }
+.ring-tick .ring-num{ animation:tick .55s var(--ease) }
+@keyframes tick{ 0%{transform:scale(1)} 36%{transform:scale(1.14)} 100%{transform:scale(1)} }
+
+.hero{ margin:14px 22px 0; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--r-xl);
+  padding:16px 18px; display:flex; flex-direction:row; align-items:center; gap:16px; cursor:pointer; position:relative; overflow:hidden; }
+.hero::before{ content:""; position:absolute; top:-60px; left:-20px; width:200px; height:160px;
+  background:radial-gradient(circle, rgba(91,69,240,.10), transparent 70%); }
+.hero-ring{ flex:none; position:relative }
+.hero-meta{ display:flex; flex-direction:column; gap:8px; flex:1; min-width:0 }
+.hmeta{ background:var(--cloud-2); border:1.5px solid var(--line-2); border-radius:var(--r); padding:9px 11px;
+  display:flex; align-items:center; gap:9px; }
+.hmeta .ic{ flex:none }
+.hmeta .n{ font-family:var(--display); font-size:18px; font-weight:600; color:var(--ink); line-height:1 }
+.hmeta .t{ font-size:11px; color:var(--ink-2); line-height:1.2; margin-top:2px }
+
+/* activation strip — encodes the North Star (3 of first 7) */
+.activate{ margin:14px 22px 0; background:linear-gradient(150deg, var(--iris-wash), var(--cloud-2));
+  border:1.5px solid var(--line-2); border-radius:var(--r-lg); padding:16px 18px; }
+.activate-h{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; }
+.activate-h b{ font-size:14px; font-weight:700; color:var(--ink) }
+.activate-h .of{ font-family:var(--display); font-size:13px; font-weight:600; color:var(--iris-deep) }
+.abar{ height:9px; border-radius:9px; background:var(--line); margin-top:12px; overflow:hidden; display:flex; gap:3px; padding:0 }
+.abar i{ flex:1; border-radius:9px; background:var(--line); transition:background .4s var(--ease) }
+.abar i.fill{ background:linear-gradient(90deg, var(--iris), var(--ember)) }
+.activate-note{ font-size:12.5px; color:var(--ink-2); margin-top:11px; line-height:1.45; }
+.activate.done{ background:linear-gradient(150deg, var(--ember-soft), var(--cloud-2)); border-color:#F8D8C9 }
+.activate.done .of{ color:var(--ember-deep) }
+
+/* section header */
+.sec-h{ display:flex; align-items:center; justify-content:space-between; margin:24px 22px 12px }
+.sec-h h3{ font-family:var(--sans); font-size:16px; font-weight:800; letter-spacing:-.01em; color:var(--ink) }
+.sec-h .date{ font-size:12.5px; color:var(--ink-3); font-weight:600 }
+
+/* habit list / log targets */
+.habits{ padding:0 22px; display:flex; flex-direction:column; gap:10px }
+.habit{
+  display:flex; align-items:center; gap:14px; background:var(--surface);
+  border:1.5px solid var(--line); border-radius:var(--r); padding:14px 15px;
+  transition:border-color .2s, background .25s, transform .12s var(--ease), box-shadow .2s; position:relative; overflow:hidden;
+}
+.habit:hover{ box-shadow:var(--shadow) }
+.habit-ic{ width:44px; height:44px; flex:none; border-radius:13px; background:var(--iris-wash); display:grid; place-items:center; color:var(--iris); transition:.25s }
+.habit-tx{ flex:1; min-width:0 }
+.habit-tx b{ display:block; font-size:15.5px; font-weight:700; color:var(--ink); line-height:1.2 }
+.habit-tx span{ font-size:12.5px; color:var(--ink-2); display:block; margin-top:2px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.logbtn{
+  width:46px; height:46px; flex:none; border-radius:50%; cursor:pointer;
+  border:2px solid var(--line); background:var(--surface); color:var(--line);
+  display:grid; place-items:center; transition:.22s var(--ease);
+}
+.logbtn:hover{ border-color:var(--iris); color:var(--iris) }
+.logbtn:active{ transform:scale(.9) }
+.habit.done{ background:var(--iris-wash); border-color:#DCD6FC }
+.habit.done .habit-ic{ background:#fff }
+.habit.done .logbtn{ background:var(--iris); border-color:var(--iris); color:#fff; box-shadow:var(--shadow-iris) }
+.habit.just .logbtn{ animation:pop .45s var(--ease) }
+@keyframes pop{ 0%{transform:scale(1)} 40%{transform:scale(1.22)} 100%{transform:scale(1)} }
+.habit.just::before{ content:""; position:absolute; inset:0; background:radial-gradient(circle at 88% 50%, rgba(255,106,61,.20), transparent 60%); animation:wash .7s var(--ease) forwards }
+@keyframes wash{ from{opacity:1} to{opacity:0} }
+
+.add-habit{ margin:12px 22px 0; }
+.add-habit button{ width:100%; display:flex; align-items:center; justify-content:center; gap:9px;
+  background:transparent; border:1.6px dashed var(--line); border-radius:var(--r); padding:14px;
+  color:var(--iris); font-family:var(--sans); font-weight:700; font-size:14.5px; cursor:pointer; transition:.18s }
+.add-habit button:hover{ border-color:var(--iris); background:var(--iris-wash) }
+
+.nudge{ margin:14px 22px 0; background:var(--ember-soft); border:1.5px solid #F8D3C2; border-radius:var(--r);
+  padding:13px 15px; display:flex; gap:11px; align-items:center }
+.nudge .ic{ color:var(--ember-deep); flex:none }
+.nudge .tx{ font-size:13px; color:#8a3a1d; line-height:1.4 }
+.nudge .tx b{ font-weight:700 }
+
+.reflect{ margin:18px 22px 8px; text-align:center; font-size:13px; color:var(--ink-3); font-weight:500; }
+
+/* ---------- PROGRESS TAB ---------- */
+.stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; padding:0 22px; margin-top:6px }
+.stat{ background:var(--surface); border:1.5px solid var(--line); border-radius:var(--r); padding:16px }
+.stat .n{ font-family:var(--display); font-size:30px; font-weight:600; color:var(--ink); line-height:1; letter-spacing:-.02em }
+.stat .l{ font-size:12px; color:var(--ink-2); margin-top:6px; font-weight:500 }
+.stat.accent{ background:linear-gradient(150deg,var(--iris-wash),var(--cloud-2)); border-color:var(--line-2) }
+.cal{ margin:18px 22px 0; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--r-lg); padding:18px }
+.cal h4{ font-family:var(--sans); font-size:14px; font-weight:800; margin-bottom:14px; color:var(--ink) }
+.cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:7px }
+.cal-dow{ font-size:10px; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-3); text-align:center; font-weight:700; padding-bottom:2px }
+.cal-cell{ aspect-ratio:1; border-radius:10px; background:var(--line-2); display:grid; place-items:center; font-size:11px; color:var(--ink-3); font-weight:600; position:relative }
+.cal-cell.done{ background:var(--iris); color:#fff }
+.cal-cell.frozen{ background:var(--glacier-soft); color:var(--glacier) }
+.cal-cell.miss{ background:var(--cloud-2); border:1.5px dotted var(--line) }
+.cal-cell.today{ box-shadow:0 0 0 2px var(--ember) }
+.cal-cell.future{ background:transparent; color:var(--line) }
+.legend{ display:flex; flex-wrap:wrap; gap:14px; margin:14px 24px 0 }
+.legend span{ font-size:11.5px; color:var(--ink-2); display:flex; align-items:center; gap:6px; font-weight:500 }
+.legend i{ width:13px; height:13px; border-radius:4px; display:inline-block }
+
+/* ---------- SETTINGS TAB ---------- */
+.set-list{ margin:8px 22px 0; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--r); overflow:hidden }
+.set-row{ display:flex; align-items:center; gap:13px; padding:15px 16px }
+.set-row + .set-row{ border-top:1.5px solid var(--line-2) }
+.set-row .ic{ width:38px; height:38px; border-radius:11px; background:var(--iris-wash); display:grid; place-items:center; color:var(--iris); flex:none }
+.set-row .tx{ flex:1 }
+.set-row .tx b{ display:block; font-size:14.5px; font-weight:700 }
+.set-row .tx span{ font-size:12px; color:var(--ink-2) }
+
+/* ============================================================ */
+/* BOTTOM NAV                                                    */
+/* ============================================================ */
+.nav{ display:flex; padding:5px 16px calc(7px + env(safe-area-inset-bottom)); background:var(--cloud-2);
+  border-top:1.5px solid var(--line); position:relative; z-index:40 }
+.nav button{ flex:1; background:none; border:none; cursor:pointer; display:flex; flex-direction:column;
+  align-items:center; gap:2px; padding:3px 0; color:var(--ink-3); font-family:var(--sans);
+  font-size:10px; font-weight:700; transition:color .18s }
+.nav button.on{ color:var(--iris) }
+.nav button:hover{ color:var(--iris) }
+.nav .ndot{ width:5px; height:5px; border-radius:50%; background:var(--iris); opacity:0; transition:.2s }
+.nav button.on .ndot{ opacity:1 }
+.nav[hidden]{ display:none }
+
+/* ============================================================ */
+/* DEMO — inline segmented control at the top of the home screen */
+/* ============================================================ */
+.demobar{ padding:44px 12px 8px; background:var(--cloud-2); border-bottom:1.5px solid var(--line); }
+.demobar-seg{ display:flex; align-items:center; gap:5px; background:var(--line-2); border-radius:11px; padding:3px; }
+.demobar-tag{ font-size:9.5px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-3); padding:0 5px 0 4px; white-space:nowrap; flex:none; }
+.demobar-seg button{ flex:1; display:inline-flex; align-items:center; justify-content:center; gap:4px;
+  border:none; background:var(--surface); color:var(--ink); cursor:pointer; font-family:var(--sans);
+  font-weight:700; font-size:11px; padding:6px 4px; border-radius:8px; box-shadow:0 1px 2px rgba(24,21,48,.06);
+  transition:background .14s, transform .14s, color .14s; white-space:nowrap; }
+.demobar-seg button:hover{ background:var(--iris-wash); color:var(--iris-deep); }
+.demobar-seg button:active{ transform:scale(.96); }
+.demobar-seg button svg{ flex:none; }
+/* milestone ladder fill */
+.mfill{ height:100%; border-radius:9px; background:linear-gradient(90deg,var(--iris),var(--ember)); transition:width .5s var(--ease); }
+
+.demo-list{ display:flex; flex-direction:column; gap:9px; margin-top:6px }
+.demo-act{ display:flex; align-items:center; gap:13px; width:100%; text-align:left; cursor:pointer;
+  background:var(--surface); border:1.5px solid var(--line); border-radius:var(--r); padding:13px 14px; transition:.16s }
+.demo-act:hover{ border-color:var(--iris); box-shadow:var(--shadow) }
+.demo-act.warn:hover{ border-color:var(--ember) }
+.demo-act .ic{ width:38px; height:38px; border-radius:11px; background:var(--cloud); display:grid; place-items:center; color:var(--ink-2); flex:none }
+.demo-act.warn .ic{ color:var(--ember-deep); background:var(--ember-soft) }
+.demo-act .tx{ flex:1 }
+.demo-act .tx b{ display:block; font-size:14px; font-weight:700; color:var(--ink) }
+.demo-act .tx span{ font-size:12px; color:var(--ink-2); line-height:1.35 }
+.demo-act .day{ font-family:var(--display); font-size:13px; font-weight:600; color:var(--iris-deep) }
+.demo-tag{ display:inline-flex; align-items:center; gap:6px; font-size:10px; font-weight:800; letter-spacing:.12em;
+  text-transform:uppercase; color:#fff; background:var(--ink); padding:4px 9px; border-radius:7px }
+
+/* ============================================================ */
+/* OVERLAYS                                                      */
+/* ============================================================ */
+.overlay{ position:absolute; inset:0; z-index:80; display:flex; align-items:flex-end; justify-content:center;
+  background:rgba(24,21,48,.40); backdrop-filter:blur(3px); animation:fade .24s ease }
+.overlay.center{ align-items:center; padding:24px }
+@keyframes fade{ from{opacity:0} to{opacity:1} }
+.sheet{ width:100%; background:var(--cloud); border-radius:30px 30px 39px 39px;
+  padding:10px 22px calc(24px + env(safe-area-inset-bottom));
+  box-shadow:0 -12px 44px rgba(24,21,48,.22); animation:rise .4s var(--ease); max-height:92%; overflow-y:auto }
+.sheet.card{ border-radius:28px; max-width:340px; animation:popin .4s var(--ease); padding:30px 24px 26px }
+@keyframes rise{ from{transform:translateY(100%)} to{transform:translateY(0)} }
+@keyframes popin{ from{transform:scale(.9); opacity:0} to{transform:scale(1); opacity:1} }
+.grab{ width:40px; height:4px; border-radius:4px; background:var(--line); margin:0 auto 18px }
+
+/* celebration */
+.celebrate{ text-align:center }
+.celebrate h2{ font-size:27px; margin-bottom:9px }
+.celebrate p{ font-size:15px; color:var(--ink-2); line-height:1.55; max-width:30ch; margin:0 auto 4px }
+.celebrate .pills{ display:flex; gap:9px; justify-content:center; margin:20px 0 6px; flex-wrap:wrap }
+.pill{ background:var(--surface); border:1.5px solid var(--line); border-radius:var(--r-pill); padding:8px 15px; font-size:13px; color:var(--ink-2); font-weight:600 }
+.pill b{ font-family:var(--display); font-size:16px; color:var(--ink); margin-right:3px }
+.confetti{ position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:90 }
+.confetti i{ position:absolute; top:-12px; width:9px; height:14px; border-radius:2px; opacity:.9; animation:fall linear forwards }
+@keyframes fall{ to{ transform:translateY(115vh) rotate(560deg); opacity:.2 } }
+
+/* weekly recap */
+.wsum h2{ font-size:25px }
+.wsum .lead{ font-size:14px; color:var(--ink-2); line-height:1.5; margin:6px 0 18px }
+.wsum-week{ display:flex; gap:7px; margin:4px 0 18px }
+.wsum-week .c{ flex:1; aspect-ratio:1; border-radius:11px; background:var(--line-2); display:grid; place-items:center; font-size:10px; color:var(--ink-3); font-weight:700 }
+.wsum-week .c.done{ background:var(--iris); color:#fff }
+.wsum-week .c.frozen{ background:var(--glacier-soft); color:var(--glacier) }
+.wsum-row{ display:flex; align-items:center; gap:13px; padding:13px 0; border-bottom:1.5px solid var(--line-2) }
+.wsum-row:last-of-type{ border-bottom:none }
+.wsum-row .ic{ width:40px; height:40px; border-radius:12px; background:var(--surface); border:1.5px solid var(--line); display:grid; place-items:center; color:var(--iris); flex:none }
+.wsum-row .tx{ flex:1 }
+.wsum-row .tx b{ display:block; font-size:14.5px; font-family:var(--display); font-weight:600 }
+.wsum-row .tx span{ font-size:12.5px; color:var(--ink-2) }
+.wsum-row .v{ font-family:var(--display); font-size:22px; font-weight:600; color:var(--ink) }
+.wsum-quote{ font-family:var(--display); font-size:15px; font-weight:500; color:var(--iris-deep); text-align:center; line-height:1.5; margin:18px 6px 22px }
+
+/* streak / freeze detail */
+.sd-split{ display:flex; gap:11px; margin:16px 0 }
+.sd-split .box{ flex:1; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--r); padding:14px; text-align:center }
+.sd-split .box .n{ font-family:var(--display); font-size:26px; font-weight:600; color:var(--ink) }
+.sd-split .box .l{ font-size:11.5px; color:var(--ink-2); margin-top:4px; line-height:1.3 }
+.freeze-card{ background:var(--glacier-soft); border:1.5px solid #C3E5F4; border-radius:var(--r); padding:15px 16px; display:flex; gap:13px; align-items:center; margin-bottom:14px }
+.freeze-card .ic{ color:var(--glacier); flex:none }
+.freeze-card .tx{ flex:1 }
+.freeze-card .tx b{ display:block; font-size:14px; font-weight:700; color:#0f5f7e }
+.freeze-card .tx span{ font-size:12.5px; color:#3a738a; line-height:1.4 }
+.freeze-pips{ display:flex; gap:5px; margin-top:7px }
+.freeze-pips i{ width:18px; height:18px; border-radius:50%; background:#fff; border:1.5px solid var(--glacier); display:grid; place-items:center; color:var(--glacier) }
+.freeze-pips i.spent{ background:transparent; border-style:dashed; opacity:.45 }
+.sd-expl{ font-size:13px; color:var(--ink-2); line-height:1.6 }
+.sd-expl b{ color:var(--ink) }
+
+/* add habit */
+.ah-grid{ display:flex; gap:9px; margin:6px 0 2px; overflow-x:auto; scrollbar-width:none; padding-bottom:2px }
+.ah-grid::-webkit-scrollbar{ height:0 }
+.ah-ic{ width:48px; height:48px; flex:0 0 auto; border-radius:13px; background:var(--iris-wash); display:grid; place-items:center; color:var(--iris); cursor:pointer; border:2px solid transparent; transition:.16s }
+.ah-ic:hover{ background:#E1DCFD }
+.ah-ic.sel{ border-color:var(--iris); background:#fff }
+
+/* toast */
+.toast{ position:absolute; left:50%; bottom:148px; transform:translateX(-50%) translateY(20px);
+  background:var(--ink); color:#fff; font-size:13.5px; font-weight:600; padding:11px 18px; border-radius:var(--r-pill);
+  box-shadow:var(--shadow-lg); z-index:95; opacity:0; transition:.3s var(--ease); display:flex; align-items:center; gap:8px; pointer-events:none; max-width:84% }
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0) }
+.toast .tic{ color:var(--glacier) }
+
+/* ============================================================ */
+/* PER-HABIT REMINDERS + EDITOR ADDITIONS                        */
+/* ============================================================ */
+.habit-rem{ display:inline-flex; align-items:center; gap:5px; margin-top:6px;
+  font-size:11px; font-weight:700; color:var(--iris-deep); background:var(--iris-wash);
+  padding:3px 9px; border-radius:var(--r-pill); }
+.habit-rem svg{ flex:none }
+.habit-rem.off{ color:var(--ink-3); background:var(--line-2) }
+.set-row.tap{ cursor:pointer; transition:background .16s }
+.set-row.tap:hover{ background:var(--cloud-2) }
+.set-row .tx b{ line-height:1.25 }
+
+/* onboarding reminder: quick presets + social proof */
+.rem-presets{ display:flex; gap:9px; margin-top:12px }
+.rem-preset{ flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+  background:var(--surface); border:1.5px solid var(--line); border-radius:var(--r);
+  padding:11px 6px; cursor:pointer; transition:.16s; font-family:var(--sans) }
+.rem-preset:hover{ border-color:var(--iris) }
+.rem-preset b{ font-family:var(--display); font-size:15px; font-weight:600; color:var(--ink) }
+.rem-preset span{ font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--ink-3) }
+.rem-preset.sel{ border-color:var(--iris); background:var(--iris-wash); box-shadow:0 0 0 3px rgba(91,69,240,.14) }
+.rem-preset.sel b{ color:var(--iris-deep) }
+.rem-preset.sel span{ color:var(--iris) }
+.proof{ display:flex; align-items:center; gap:14px; margin-top:16px;
+  background:linear-gradient(150deg,var(--ember-soft),var(--cloud-2)); border:1.5px solid #F8D8C9;
+  border-radius:var(--r); padding:14px 16px }
+.proof-n{ font-family:var(--display); font-size:30px; font-weight:700; color:var(--ember-deep); line-height:1; flex:none }
+.proof-tx{ font-size:12.5px; color:#8a3a1d; line-height:1.45 }
+.proof-tx b{ font-weight:800; color:var(--ember-deep) }
+
+/* first-win / streak-start screen */
+.firstwin-wrap{ display:flex; flex-direction:column; min-height:100% }
+.streak-banner{ position:relative; overflow:hidden; border-radius:var(--r-xl); margin-top:8px;
+  background:linear-gradient(155deg, var(--iris-deep), #2A1E6E 70%, #3A1E5E);
+  color:#fff; padding:22px 22px 18px; box-shadow:var(--shadow-iris) }
+.streak-banner::before{ content:""; position:absolute; right:-44px; top:-44px; width:170px; height:170px;
+  background:radial-gradient(circle, rgba(255,106,61,.42), transparent 68%) }
+.sb-eyebrow{ font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:#FFC9B4; position:relative }
+.sb-num{ font-family:var(--display); line-height:1; margin-top:8px; position:relative }
+.sb-cur{ font-size:52px; font-weight:700; letter-spacing:-.03em }
+.sb-of{ font-size:20px; font-weight:600; color:rgba(255,255,255,.55); margin-left:6px }
+.sb-copy{ font-size:13.5px; line-height:1.5; color:rgba(255,255,255,.86); margin-top:8px; max-width:34ch; position:relative }
+.wk-strip{ display:flex; gap:6px; margin-top:16px; position:relative }
+.wk-cell{ flex:1; aspect-ratio:1; max-height:34px; border-radius:9px; background:rgba(255,255,255,.14);
+  display:grid; place-items:center; font-size:11px; font-weight:700; color:rgba(255,255,255,.7) }
+.wk-cell.on{ background:var(--ember); color:#fff; box-shadow:var(--shadow-ember) }
+.fw-habit{ display:flex; align-items:flex-start; gap:13px; margin-top:16px; background:var(--surface);
+  border:1.5px solid var(--line); border-radius:var(--r); padding:15px 16px }
+.fw-ic{ width:44px; height:44px; flex:none; border-radius:13px; background:var(--iris-wash);
+  display:grid; place-items:center; color:var(--iris) }
+.fw-tx b{ display:block; font-size:15px; font-weight:700; color:var(--ink); line-height:1.25 }
+.fw-tx span{ display:block; font-size:12.5px; color:var(--ink-2); line-height:1.45; margin-top:4px }
+.fw-points{ list-style:none; margin:16px 2px 0; display:flex; flex-direction:column; gap:9px }
+.fw-points li{ display:flex; align-items:center; gap:9px; font-size:13px; color:var(--ink-2); font-weight:500 }
+.fw-points li svg{ color:var(--iris); flex:none }
+
+/* ============================================================ */
+/* RESPONSIVE — full-bleed app on phones                         */
+/* ============================================================ */
+@media (max-width:560px){
+  body{ padding:0; align-items:stretch; background:var(--cloud) }
+  .stage{ gap:0 }
+  .frame{ width:100%; height:100dvh; max-height:none; border-radius:0; padding:0; box-shadow:none; background:var(--cloud) }
+  .frame::after{ display:none }
+  .screen{ border-radius:0 }
+  .island{ display:none }
+  .pad,.welcome{ padding-top:max(36px, env(safe-area-inset-top)) }
+  .app-head,.ob-top{ padding-top:max(26px, env(safe-area-inset-top)) }
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important }
+  .confetti{ display:none }
+}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="frame">
+      <div class="screen">
+        <div id="root" class="view" role="main"></div>
+        <nav id="nav" class="nav" hidden>
+          <button data-tab="today" aria-label="Today"><span class="navic"></span><span>Today</span><span class="ndot"></span></button>
+          <button data-tab="progress" aria-label="Progress"><span class="navic"></span><span>Progress</span><span class="ndot"></span></button>
+          <button data-tab="settings" aria-label="You"><span class="navic"></span><span>You</span><span class="ndot"></span></button>
+        </nav>
+        <div id="overlay-root"></div>
+        <div id="toast" class="toast" role="status" aria-live="polite"></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+"use strict";
+/* ===========================================================================
+   MOMENTUM — habit tracker prototype (single file, no backend).
+   In-memory only: nothing is persisted, so it starts fresh from onboarding on
+   every open/reload (there is no manual reset control).
+   Built around one activation metric: get a new user to log a habit 3+ times
+   in their first 7 days. Levers: tight tiny-habit onboarding, a per-habit
+   reminder set during onboarding, a streak-start first-win ("01/07"), a
+   charging Momentum Ring + first-week activation strip, celebrations, weekly
+   recap, and forgiving streak freezes.
+=========================================================================== */
+const DAY = 86400000;
+const $  = (s, r=document) => r.querySelector(s);
+const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+/* ---------- icons (stroke SVG, currentColor) ---------- */
+const P = {
+  drop:'<path d="M12 3.5S6 10 6 14.5a6 6 0 0 0 12 0C18 10 12 3.5 12 3.5z"/>',
+  book:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M20 18H6.5A2.5 2.5 0 0 0 4 20.5"/>',
+  move:'<circle cx="12" cy="5" r="2.2"/><path d="M5 21c1.5-4 4-6 7-6s5.5 2 7 6"/><path d="M12 9v5"/><path d="M8 12h8"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19"/>',
+  broom:'<path d="M14 3 21 10M9.5 13.5 13 10M5 21c0-4 1-6 4.5-7.5L13 10l1 1-3.5 3.5C7 16 5 17 5 21z"/>',
+  pencil:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  bell:'<path d="M6 9a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6z"/><path d="M10 20a2 2 0 0 0 4 0"/>',
+  flame:'<path d="M12 22c4 0 7-2.6 7-6.5 0-3-2-5-3-6.5-.6 1.4-1.8 2-2.6 1.6C13.6 9 15 6 12 2c.4 4-3 5.2-4.4 7.4C6.6 11 5 12.7 5 15.5 5 19.4 8 22 12 22z"/>',
+  snow:'<path d="M12 2v20M4.5 7l15 10M19.5 7l-15 10"/><path d="M12 6l-2 1.5M12 6l2 1.5M12 18l-2-1.5M12 18l2-1.5"/>',
+  check:'<path d="M4 12.5 9 17.5 20 6.5"/>',
+  chev:'<path d="M9 6l6 6-6 6"/>',
+  target:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.4"/>',
+  clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/>',
+  bolt:'<path d="M13 2 4 14h6l-1 8 9-12h-6z"/>',
+  gear:'<circle cx="12" cy="12" r="3.2"/><path d="M12 2.5l1.4 2.6 2.9-.5 .6 2.9 2.6 1.4-1.3 2.6 1.3 2.6-2.6 1.4-.6 2.9-2.9-.5L12 21.5l-1.4-2.6-2.9.5-.6-2.9-2.6-1.4 1.3-2.6L4 9.9l2.6-1.4.6-2.9 2.9.5z"/>',
+  info:'<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/>',
+  spark:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/>',
+  heart:'<path d="M12 20S4 14.5 4 9.2A4.2 4.2 0 0 1 12 7a4.2 4.2 0 0 1 8 2.2C20 14.5 12 20 12 20z"/>',
+  leaf:'<path d="M5 19C5 11 11 5 19 5c0 8-6 14-14 14z"/><path d="M5 19c3-5 6-7 10-9"/>',
+  sprout:'<path d="M12 21v-7"/><path d="M12 14C12 9 8.5 7 5 7c0 4.5 3 7 7 7z"/><path d="M12 12c0-3.5 3-5.5 6.5-5.5C18.5 10 15.5 12 12 12z"/>',
+  home:'<path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/>',
+  chart:'<path d="M4 20V4M4 20h16"/><rect x="7" y="12" width="3" height="5" rx="1"/><rect x="12" y="8" width="3" height="9" rx="1"/><rect x="17" y="5" width="3" height="12" rx="1"/>',
+  user:'<circle cx="12" cy="8" r="3.6"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/>',
+  close:'<path d="M6 6l12 12M18 6 6 18"/>',
+  moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>',
+  coffee:'<path d="M4 8h13v5a5 5 0 0 1-10 0z"/><path d="M17 9h2.5a2.5 2.5 0 0 1 0 5H17"/><path d="M6 3v2M10 3v2M14 3v2"/>',
+  forward:'<path d="M5 5l7 7-7 7M13 5l7 7-7 7"/>',
+  skipfwd:'<path d="M5 4l10 8-10 8zM19 5v14"/>',
+  refresh:'<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>',
+  sliders:'<path d="M4 6h10M18 6h2M4 12h2M10 12h10M4 18h13M21 18h-1"/><circle cx="15" cy="6" r="2"/><circle cx="8" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'
+};
+const ic = (n, size=22, sw=2) =>
+  `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${P[n]||''}</svg>`;
+
+/* ---------- tiny-habit templates ---------- */
+const TEMPLATES = [
+  { id:'water',    icon:'drop',  title:'Drink water',    tiny:'one glass',          desc:'Start the day hydrated and clear-headed' },
+  { id:'move',     icon:'move',  title:'Move your body', tiny:'two minutes',        desc:'A short walk or stretch to wake up' },
+  { id:'read',     icon:'book',  title:'Read',           tiny:'one page',           desc:'A few quiet pages to unwind and learn' },
+  { id:'meditate', icon:'heart', title:'Meditate',       tiny:'three slow breaths', desc:'A calm minute to reset your mind' },
+  { id:'custom',   icon:'plus',  title:'Something else', tiny:'keep it tiny',       desc:'Pick your own tiny habit to build' }
+];
+const CUES = ['After I wake up','With my coffee','After lunch','After work','Before bed'];
+const ICON_CHOICES = ['drop','book','move','sun','broom','pencil','leaf','heart','moon','coffee','sprout','target'];
+
+/* momentum ramp: cool iris -> hot ember (the "charge") */
+const RAMP = ['#5B45F0','#6E44EC','#8A45DF','#A948C6','#CE5193','#ED5C5E','#FF6A3D'];
+
+/* ---------- state (in-memory only, no persistence) ----------
+   The prototype intentionally does NOT remember anything between visits.
+   Every time it is opened or reloaded it starts fresh from onboarding,
+   so there is no "reset" control anywhere in the UI. */
+let MEM = null;
+function persistWrite(o){ MEM = o; }            // session scratch only; never read back on load
+const FRESH = () => ({
+  onboarded:false, startISO:null, startTs:null, advance:0,
+  habits:[], logs:{}, seen:{ firstLog:false, activated:false }, weeksShown:[],
+  freezesMax:2, tab:'today'
+});
+let state = FRESH();                              // always a clean slate when the prototype opens
+let UI = { screen:'welcome', obStep:0, draft:null, overlay:null, flash:null, editId:null };
+let OQ = [];   // celebratory overlay queue
+function save(){ persistWrite(state); }
+
+/* ---------- date helpers ---------- */
+const pad = n => String(n).padStart(2,'0');
+const iso = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+function addDays(isoStr, n){ const d=new Date(isoStr+'T00:00:00'); d.setDate(d.getDate()+n); return iso(d); }
+function cursor(){ const real=state.startTs?Math.floor((Date.now()-state.startTs)/DAY):0; return Math.max(real, state.advance||0); }
+function niceDate(isoStr){ return new Date(isoStr+'T00:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }
+function dow1(isoStr){ return new Date(isoStr+'T00:00:00').toLocaleDateString(undefined,{weekday:'short'}).slice(0,1); }
+function greeting(){ const h=new Date().getHours(); return h<12?'Good morning':h<18?'Good afternoon':'Good evening'; }
+function fmtTime(t){ const [h,m]=t.split(':').map(Number); const ap=h<12?'AM':'PM'; const hh=((h+11)%12)+1; return `${hh}:${pad(m)} ${ap}`; }
+
+/* ---------- derived state (pure; recomputed each render) ---------- */
+function compute(){
+  const start = state.startISO, cur = cursor();
+  const loggedDay = i => state.habits.some(h => state.logs[h.id+'|'+addDays(start,i)]);
+  const frozen = {}; let fr = state.freezesMax, lastWk = -1;
+  for(let i=0;i<=cur;i++){
+    const wk = Math.floor(i/7);
+    if(wk>lastWk){ fr = state.freezesMax; lastWk = wk; }            // freezes refill each week
+    if(i<cur && !loggedDay(i)){ if(fr>0){ frozen[i]=true; fr--; } } // auto-cover a missed past day
+  }
+  let streak=0, d=cur;
+  if(!loggedDay(cur)) d=cur-1;                                      // today in-progress doesn't break a streak
+  while(d>=0){ if(loggedDay(d)){streak++;d--;} else if(frozen[d]){d--;} else break; }
+  const set=new Set(); for(const k in state.logs){ if(state.logs[k]) set.add(k.split('|')[1]); }
+  let week1=0; for(let i=0;i<7&&i<=cur;i++) if(loggedDay(i)) week1++;
+  const wkNow=Math.floor(cur/7); let twTotal=0, twDone=0;
+  for(let i=wkNow*7;i<=cur;i++){ twTotal++; if(loggedDay(i)) twDone++; }
+  return { start, cur, curDate:addDays(start,cur), loggedDay, frozen,
+           freezesLeft:fr, streak, totalDays:set.size, week1, wkNow, twTotal, twDone };
+}
+
+/* ===========================================================================
+   THE SIGNATURE — Momentum Ring (SVG arc gauge)
+=========================================================================== */
+function polar(cx,cy,r,deg){ const a=(deg-90)*Math.PI/180; return [cx+r*Math.cos(a), cy+r*Math.sin(a)]; }
+function arcPath(cx,cy,r,a0,a1){
+  const [x1,y1]=polar(cx,cy,r,a0), [x2,y2]=polar(cx,cy,r,a1);
+  const large=(a1-a0)<=180?0:1;
+  return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+}
+/* fills: array of 7 statuses: 'done'|'todayDone'|'today'|'frozen'|'miss'|'future' */
+function ringSVG(fills, size){
+  const cx=size/2, cy=size/2, sw=Math.round(size*0.072), r=size/2 - sw/2 - 3;
+  const gap=7, seg=(360 - 7*gap)/7;
+  let bg='', fg='';
+  let leadAngle=null, ignite=false, doneCount=0;
+  for(let i=0;i<7;i++){
+    const a0=i*(seg+gap)+gap/2, a1=a0+seg;
+    bg += `<path d="${arcPath(cx,cy,r,a0,a1)}" stroke="var(--line)" stroke-width="${sw}" fill="none" stroke-linecap="round"/>`;
+    const s=fills[i];
+    if(s==='done'||s==='todayDone'){
+      const col=RAMP[i];
+      const cls=s==='todayDone'?' class="seg-today"':'';
+      fg += `<path${cls} d="${arcPath(cx,cy,r,a0,a1)}" stroke="${col}" stroke-width="${sw}" fill="none" stroke-linecap="round"/>`;
+      leadAngle=a1; doneCount++;
+      if(i>=2) ignite=true; // 3rd day (index 2) lights the spark
+    } else if(s==='frozen'){
+      fg += `<path d="${arcPath(cx,cy,r,a0,a1)}" stroke="var(--glacier)" stroke-width="${sw}" fill="none" stroke-linecap="round" opacity=".9"/>`;
+    } else if(s==='today'){
+      fg += `<path class="seg-today" d="${arcPath(cx,cy,r,a0,a1)}" stroke="var(--iris)" stroke-width="${sw}" fill="none" stroke-linecap="round" stroke-dasharray="2 ${Math.round(sw*0.9)}"/>`;
+    }
+  }
+  let spark='';
+  if(leadAngle!=null){
+    const [sx,sy]=polar(cx,cy,r,leadAngle);
+    const col=ignite?'#FF6A3D':RAMP[Math.max(0,doneCount-1)];
+    spark = `<circle cx="${sx.toFixed(2)}" cy="${sy.toFixed(2)}" r="${(sw*0.62).toFixed(1)}" fill="#fff"/>`
+          + `<circle cx="${sx.toFixed(2)}" cy="${sy.toFixed(2)}" r="${(sw*0.42).toFixed(1)}" fill="${col}"/>`;
+  }
+  return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true">${bg}${fg}${spark}</svg>`;
+}
+function weekFills(c){
+  const wk=c.wkNow, out=[];
+  for(let j=0;j<7;j++){
+    const di=wk*7+j;
+    if(di>c.cur) out.push('future');
+    else if(di===c.cur) out.push(c.loggedDay(di)?'todayDone':'today');
+    else if(c.loggedDay(di)) out.push('done');
+    else if(c.frozen[di]) out.push('frozen');
+    else out.push('miss');
+  }
+  return out;
+}
+
+/* ===========================================================================
+   RENDER
+=========================================================================== */
+const root = $('#root'), navEl = $('#nav'), ovRoot = $('#overlay-root');
+
+function render(){
+  if(UI.screen==='welcome'){ navEl.hidden=true; root.innerHTML=viewWelcome(); }
+  else if(UI.screen==='onboard'){ navEl.hidden=true; root.innerHTML=viewOnboard(); }
+  else if(UI.screen==='firstlog'){ navEl.hidden=true; root.innerHTML=viewFirstLog(); }
+  else { navEl.hidden=false; root.innerHTML=viewApp(); syncNav(); }
+  renderOverlay();
+}
+
+/* ---------- WELCOME ---------- */
+function viewWelcome(){
+  const demoFills=['done','done','todayDone','today','future','future','future'];
+  return `<div class="welcome">
+    <div class="brandmark">${brandRing(30)}<span class="brand-name">Momentum</span></div>
+    <div class="welcome-ring">${ringWrap(demoFills,150,`<div class="ring-glyph">${ic('bolt',34,1.8)}</div>`)}</div>
+    <div class="welcome-hero">
+      <div class="eyebrow">Your first seven days</div>
+      <h1>Small days,<br><em>real momentum.</em></h1>
+      <p>Pick one tiny habit. Show up for a few minutes a day and watch your week charge up — your streak survives an off day, too.</p>
+    </div>
+    <div>
+      <button class="btn btn-primary" data-act="begin">Get started ${ic('forward',18,2.4)}</button>
+      <div class="welcome-foot">About a minute · no account needed</div>
+    </div>
+  </div>`;
+}
+function brandRing(size){
+  const id='bg'+Math.random().toString(36).slice(2,7);
+  return `<span style="display:inline-grid;place-items:center;width:${size}px;height:${size}px">
+    <svg width="${size}" height="${size}" viewBox="0 0 32 32" aria-hidden="true">
+      <defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#5B45F0"/><stop offset="1" stop-color="#FF6A3D"/></linearGradient></defs>
+      <circle cx="16" cy="16" r="11" fill="none" stroke="url(#${id})" stroke-width="4.2"/>
+      <circle cx="16" cy="5" r="3" fill="#fff"/><circle cx="16" cy="5" r="1.8" fill="#FF6A3D"/>
+    </svg></span>`;
+}
+function ringWrap(fills,size,centerHTML,tick){
+  return `<div class="ring-wrap${tick?' ring-tick':''}" style="width:${size}px;height:${size}px">
+    ${ringSVG(fills,size)}
+    <div class="ring-center">${centerHTML}</div>
+  </div>`;
+}
+
+/* ---------- ONBOARDING ---------- */
+function viewOnboard(){
+  const step=UI.obStep;
+  const dots=[0,1,2].map(i=>`<i class="${i<step?'done':i===step?'on':''}"></i>`).join('');
+  let body = step===0?obPick() : step===1?obTiny() : obReminder();
+  const d=UI.draft||{};
+  const canNext = step===0 ? !!d.id : true;
+  const label = 'Continue';
+  return `<div class="ob-top"><div class="steps">${dots}</div></div>
+    ${body}
+    <div class="ob-foot">
+      <button class="btn btn-primary" data-act="ob-next" ${canNext?'':'disabled style="opacity:.45;pointer-events:none"'}>${label}</button>
+      ${step>0?'<button class="btn btn-ghost" data-act="ob-back">Back</button>':''}
+    </div>`;
+}
+function obPick(){
+  const sel=(UI.draft&&UI.draft.id)||'';
+  const cards=TEMPLATES.map(t=>`
+    <button class="tmpl ${sel===t.id?'sel':''}" data-tmpl="${t.id}">
+      <span class="tmpl-ic">${ic(t.icon,22)}</span>
+      <span class="tmpl-tx"><b>${t.title}</b><span>${t.desc}</span></span>
+      <span class="tmpl-check">${ic('check',20)}</span>
+    </button>`).join('');
+  return `<div class="pad" style="padding-bottom:4px">
+      <div class="eyebrow">Step 1 of 3</div>
+      <h2 class="ob-q">What's one small thing<br>you'll do <em style="font-style:italic;color:var(--iris)">daily</em>?</h2>
+      <p class="ob-sub">Pick the easiest version — consistency beats ambition. You can always level up later.</p>
+    </div>
+    <div class="templates">${cards}</div>
+    <div style="height:8px"></div>`;
+}
+function obTiny(){
+  const d=UI.draft;
+  const isCustom=d.id==='custom';
+  const tinyTxt=(d.tiny||'do my tiny habit').toLowerCase();
+  return `<div class="pad" style="padding-bottom:4px">
+      <div class="eyebrow">Step 2 of 3</div>
+      <h2 class="ob-q">Make it tiny.</h2>
+      <p class="ob-sub">A habit you can't fail is a habit that sticks. Start smaller than feels impressive.</p>
+      ${isCustom?`
+        <div class="field"><label>Your habit</label>
+          <input class="input" id="f-title" placeholder="e.g. Meditate" value="${d.title||''}"/></div>
+        <div class="field"><label>The tiny version</label>
+          <input class="input" id="f-tiny" placeholder="e.g. one slow breath" value="${d.tiny||''}"/></div>`
+      :`
+        <div class="tiny-card">
+          <div class="lab">Your tiny habit</div>
+          <div class="big">${d.title} — <span style="color:var(--iris)">${d.tiny}</span></div>
+          <div class="why">${ic('spark',15)}<span>Tiny on purpose. Once it's easy, it grows on its own.</span></div>
+        </div>`}
+      <div class="field" style="margin-top:20px"><label>When will you do it? <span style="font-weight:400;color:var(--ink-3)">(optional)</span></label>
+        <div class="chip-row">${CUES.map(c=>`<button class="chip ${d.cue===c?'sel':''}" data-cue="${c}">${c}</button>`).join('')}</div>
+      </div>
+      <p class="ob-sub" style="margin-top:12px;font-size:13px">${d.cue?`<b style="font-weight:600;color:var(--iris-deep)">"${d.cue}, I'll ${tinyTxt}."</b> Anchoring a habit to something you already do makes it easier to remember.`:'Linking it to a moment you already have helps it stick.'}</p>
+    </div>`;
+}
+function obReminder(){
+  const r=(UI.draft&&UI.draft.reminder)||{enabled:true,time:'08:00'};
+  const presets=[{t:'07:00',lab:'Early'},{t:'08:00',lab:'Recommended'},{t:'20:00',lab:'Evening'}];
+  const chips=presets.map(p=>`<button class="rem-preset ${r.time===p.t?'sel':''}" data-rempreset="${p.t}"><b>${fmtTime(p.t)}</b><span>${p.lab}</span></button>`).join('');
+  const dim = r.enabled?'':'style="opacity:.4;pointer-events:none"';
+  return `<div class="pad" style="padding-bottom:4px">
+      <div class="eyebrow">Step 3 of 3</div>
+      <h2 class="ob-q">When should we<br>nudge you?</h2>
+      <p class="ob-sub">Most missed habits come down to forgetting — not giving up. One kind, well-timed reminder does the heavy lifting.</p>
+      <div class="rem-card" style="margin-top:18px">
+        <div class="rem-row">
+          <span class="rem-ic">${ic('bell',20)}</span>
+          <span class="rem-tx"><b>Daily nudge</b><span>One a day for this habit — off anytime</span></span>
+          <label class="switch"><input type="checkbox" id="f-rem" ${r.enabled?'checked':''}/><span class="track"></span><span class="knob"></span></label>
+        </div>
+        <div class="rem-row" ${dim}>
+          <span class="rem-ic">${ic('clock',20)}</span>
+          <span class="rem-tx"><b>Remind me at</b><span>Pick a time you're usually free</span></span>
+          <input class="time-input" type="time" id="f-time" value="${r.time}"/>
+        </div>
+      </div>
+      <div class="rem-presets" ${dim}>${chips}</div>
+      <div class="proof">
+        <span class="proof-n">3&times;</span>
+        <span class="proof-tx"><b>more likely to stick.</b> In our early data, people who set a reminder kept logging through their first week far more often than those who didn't.</span>
+      </div>
+    </div>`;
+}
+
+/* ---------- FIRST-LOG MOMENT (the activation move) ---------- */
+function viewFirstLog(){
+  const h=state.habits[0];
+  const today=new Date(state.startISO+'T00:00:00');
+  const dowMon=(today.getDay()+6)%7; // 0 = Mon
+  const labels=['M','T','W','T','F','S','S'];
+  const strip=labels.map((l,i)=>`<span class="wk-cell ${i===dowMon?'on':''}">${l}</span>`).join('');
+  const remLine = h.remEnabled ? `Reminder set for tomorrow at ${fmtTime(h.remTime)}` : 'No reminder yet — you can add one anytime';
+  return `<div class="firstwin-wrap">
+      <div class="pad" style="flex:1;padding-bottom:0">
+        <div class="streak-banner">
+          <div class="sb-eyebrow">Your streak starts here</div>
+          <div class="sb-num"><span class="sb-cur">01</span><span class="sb-of">/ 07</span></div>
+          <p class="sb-copy">Log once and your first week begins charging. We'll wait — there's no rush.</p>
+          <div class="wk-strip">${strip}</div>
+        </div>
+        <div class="fw-habit">
+          <span class="fw-ic">${ic(h.icon,22)}</span>
+          <div class="fw-tx">
+            <b>${h.title} — try it right now</b>
+            <span>${h.tiny}. A tiny first win is what locks the habit in.</span>
+          </div>
+        </div>
+        <ul class="fw-points">
+          <li>${ic('check',15)} Counts as day 1 of your streak</li>
+          <li>${ic('check',15)} ${remLine}</li>
+          <li>${ic('check',15)} Takes less time than this setup did</li>
+        </ul>
+      </div>
+      <div class="ob-foot">
+        <button class="btn btn-ember" data-log="${h.id}">${ic('check',18,2.6)} I did it — start my streak</button>
+        <button class="btn btn-ghost" data-act="skip-firstlog">I'll do it later</button>
+      </div>
+    </div>`;
+}
+
+/* ---------- APP SHELL ---------- */
+function viewApp(){
+  if(state.tab==='progress') return appProgress();
+  if(state.tab==='settings') return appSettings();
+  return appToday();
+}
+function appToday(){
+  const c=compute();
+  const todayLogged=c.loggedDay(c.cur);
+  const pending=state.habits.filter(h=>!state.logs[h.id+'|'+c.curDate]).length;
+  const fills=weekFills(c);
+  const flameHTML = c.streak>0 ? `<div class="ring-flame">${ic('flame',18,1.8)}</div>` : '';
+  const center = `${flameHTML}<div class="ring-num" style="font-size:38px">${c.streak}</div><div class="ring-cap">day streak</div>`;
+
+  const rows=state.habits.map(h=>{
+    const done=!!state.logs[h.id+'|'+c.curDate];
+    const fl=UI.flash===h.id;
+    return `<div class="habit ${done?'done':''} ${fl?'just':''}" data-log="${h.id}">
+      <span class="habit-ic">${ic(h.icon,22)}</span>
+      <span class="habit-tx"><b>${h.title}</b><span>${h.tiny}${h.cue?' · '+h.cue:''}</span>${h.remEnabled?`<span class="habit-rem">${ic('bell',12,2)} ${fmtTime(h.remTime)}</span>`:''}</span>
+      <button class="logbtn" aria-label="${done?'Logged':'Log'} ${h.title}" aria-pressed="${done}">${ic('check',22)}</button>
+    </div>`;
+  }).join('');
+
+  // milestone ladder — counts total days logged (cumulative), climbing 3 -> 7 -> 15 -> 30 -> 60 -> 100
+  let strip='';
+  {
+    const LADDER=[3,7,15,30,60,100];
+    const tot=c.totalDays;
+    let next=LADDER.find(m=>tot<m);
+    const maxed=next===undefined; if(maxed) next=LADDER[LADDER.length-1];
+    const MILE={
+      3:{t:'Lock in your habit',   n:'Log on any three days and the habit starts to stick.'},
+      7:{t:'One week strong',      n:'A full week of momentum is within reach.'},
+      15:{t:'Going the distance',  n:'Past two weeks — this is becoming who you are.'},
+      30:{t:'A month of momentum', n:'Thirty days is where a habit turns automatic.'},
+      60:{t:'Two months deep',     n:'Sixty days. This is just what you do now.'},
+      100:{t:'The hundred club',   n:'One hundred days of showing up. Remarkable.'}
+    };
+    const m=MILE[next]||MILE[100];
+    const rem=Math.max(next-tot,0);
+    const pct=Math.min(100,Math.round((tot/next)*100));
+    strip=`<div class="activate ${maxed?'done':''}">
+      <div class="activate-h"><b>${maxed?'Unstoppable':m.t}</b><span class="of">${tot} / ${next} days</span></div>
+      <div class="abar"><span class="mfill" style="width:${pct}%"></span></div>
+      <div class="activate-note">${maxed
+        ? `You've logged <b style="font-weight:700;color:var(--ink)">${tot} days</b> — the ladder's maxed. Now you're just collecting them.`
+        : `${m.n} <b style="font-weight:700;color:var(--ink)">${rem} more ${rem===1?'day':'days'}</b> to your next milestone.`}</div>
+    </div>`;
+  }
+
+  return `
+    <div class="demobar">
+      <div class="demobar-seg">
+        <span class="demobar-tag">Day ${c.cur+1}</span>
+        <button data-act="d-next">${ic('forward',13)} Advance</button>
+        <button data-act="d-skip">${ic('skipfwd',13)} Skip</button>
+        <button data-act="d-week">${ic('bolt',13)} Jump to 7</button>
+      </div>
+    </div>
+    <div class="app-head" style="padding-top:16px">
+      <div class="hello"><div class="eyebrow">${niceDate(c.curDate)}</div><h2>${greeting()}.</h2></div>
+      <button class="icon-btn" data-act="tab-settings" aria-label="Settings">${ic('gear',20)}</button>
+    </div>
+
+    <div class="hero" data-act="streak">
+      <div class="hero-ring">${ringWrap(fills,118,center,!!UI.flash)}</div>
+      <div class="hero-meta">
+        <div class="hmeta"><span class="ic" style="color:var(--iris)">${ic('sprout',20)}</span><span><span class="n">${c.totalDays}</span><div class="t">total days<br>logged</div></span></div>
+        <div class="hmeta"><span class="ic" style="color:var(--glacier)">${ic('snow',19)}</span><span><span class="n">${c.freezesLeft}</span><div class="t">freezes<br>this week</div></span></div>
+      </div>
+    </div>
+
+    ${strip}
+
+    <div class="sec-h"><h3>${pending>0?'Today':'All done today'}</h3><span class="date">${state.habits.length-pending}/${state.habits.length} done</span></div>
+    <div class="habits">${rows}</div>
+    <div class="add-habit"><button data-act="add">${ic('plus',18)} Add another tiny habit</button></div>
+
+    <div class="reflect">${todayLogged?'Nice. Same time tomorrow.':'Small days, done daily.'}</div>
+    <div style="height:90px"></div>`;
+}
+
+function appProgress(){
+  const c=compute();
+  return `
+    <div class="app-head"><div class="hello"><div class="eyebrow">Your progress</div><h2>Showing up</h2></div></div>
+    <div class="stat-grid" style="margin-top:14px">
+      <div class="stat accent"><div class="n">${c.streak}</div><div class="l">Current streak</div></div>
+      <div class="stat"><div class="n">${c.totalDays}</div><div class="l">Total days logged</div></div>
+      <div class="stat"><div class="n">${c.twDone}<span style="font-size:16px;color:var(--ink-3)">/${c.twTotal}</span></div><div class="l">This week</div></div>
+      <div class="stat"><div class="n">${c.freezesLeft}</div><div class="l">Freezes available</div></div>
+    </div>
+    <div class="cal">
+      <h4>The last month</h4>
+      <div class="cal-grid">${['M','T','W','T','F','S','S'].map(d=>`<div class="cal-dow">${d}</div>`).join('')}${calendarCells(c)}</div>
+    </div>
+    <div class="legend">
+      <span><i style="background:var(--iris)"></i>Logged</span>
+      <span><i style="background:var(--glacier-soft);box-shadow:inset 0 0 0 1.5px var(--glacier)"></i>Freeze used</span>
+      <span><i style="background:var(--cloud-2);box-shadow:inset 0 0 0 1.5px var(--line)"></i>Missed</span>
+    </div>
+    <div class="reflect" style="margin-top:22px">Missed days don't erase the rest. Progress is the point.</div>
+    <div style="height:90px"></div>`;
+}
+function calendarCells(c){
+  const start=c.start;
+  const startDow=(new Date(start+'T00:00:00').getDay()+6)%7; // 0=Mon
+  const total=c.cur+1;
+  const weeks=Math.ceil((startDow+Math.max(total,30))/7);
+  let out='';
+  for(let cell=0; cell<weeks*7; cell++){
+    const di=cell-startDow;
+    if(di<0){ out+='<div class="cal-cell future"></div>'; continue; }
+    const dateStr=addDays(start,di);
+    const n=new Date(dateStr+'T00:00:00').getDate();
+    let cls='';
+    if(di>c.cur) cls='future';
+    else if(c.loggedDay(di)) cls='done';
+    else if(c.frozen[di]) cls='frozen';
+    else cls='miss';
+    if(di===c.cur) cls+=' today';
+    out+=`<div class="cal-cell ${cls}">${di>c.cur?'':n}</div>`;
+  }
+  return out;
+}
+function appSettings(){
+  const h=state.habits;
+  const rows=h.map(x=>`
+    <div class="set-row tap" data-edit="${x.id}">
+      <span class="ic">${ic(x.icon,18)}</span>
+      <span class="tx">
+        <b>${x.title}</b>
+        <span>${x.tiny}${x.cue?' · '+x.cue:''}</span>
+        ${x.remEnabled?`<span class="habit-rem">${ic('bell',12,2)} Daily · ${fmtTime(x.remTime)}</span>`:`<span class="habit-rem off">${ic('bell',12,2)} Nudge off</span>`}
+      </span>
+      <span style="color:var(--line)">${ic('chev',18)}</span>
+    </div>`).join('');
+  return `
+    <div class="app-head"><div class="hello"><div class="eyebrow">You</div><h2>Your setup</h2></div></div>
+
+    <div class="sec-h"><h3>Your habits</h3><span class="date">Tap to set the nudge</span></div>
+    <div class="set-list">${rows}</div>
+    <div class="add-habit"><button data-act="add">${ic('plus',18)} Add another habit</button></div>
+
+    <div class="sec-h"><h3>About</h3></div>
+    <div class="set-list">
+      <div class="set-row tap" data-act="streak"><span class="ic" style="color:var(--glacier);background:var(--glacier-soft)">${ic('snow',18)}</span><span class="tx"><b>How streaks work</b><span>The forgiving kind</span></span><span style="color:var(--line)">${ic('chev',18)}</span></div>
+    </div>
+    <div class="reflect" style="margin-top:24px">Momentum · a calm place to begin</div>
+    <div style="height:90px"></div>`;
+}
+
+/* ===========================================================================
+   OVERLAYS
+=========================================================================== */
+function renderOverlay(){
+  const id=OQ[0]||UI.overlay||null;
+  if(!id){ ovRoot.innerHTML=''; return; }
+  let html='';
+  if(id==='firstwin') html=ovFirstWin();
+  else if(id==='activate') html=ovActivate();
+  else if(id.startsWith('week:')) html=ovWeek(parseInt(id.split(':')[1],10));
+  else if(id==='streak') html=ovStreak();
+  else if(id==='add') html=ovAdd();
+  else if(id==='habitedit') html=ovHabitEdit();
+  ovRoot.innerHTML=html;
+  if(id==='firstwin'||id==='activate') burst();
+}
+function ovFirstWin(){
+  return `<div class="overlay center"><div class="sheet card celebrate">
+    <div style="margin:0 auto 16px">${ringWrap(['todayDone','future','future','future','future','future','future'],128,`<div class="ring-num" style="font-size:46px">1</div>`)}</div>
+    <h2>That's day one.</h2>
+    <p>The hardest part is starting — and you just did. Your streak begins here.</p>
+    <div class="pills"><span class="pill"><b>1</b>day streak</span></div>
+    <button class="btn btn-ember" data-act="ov-close" style="margin-top:18px">Keep it going</button>
+  </div></div>`;
+}
+function ovActivate(){
+  const c=compute();
+  return `<div class="overlay center"><div class="sheet card celebrate">
+    <div style="margin:0 auto 14px">${ringWrap(weekFills(c),128,`<div class="ring-flame">${ic('flame',20,1.8)}</div><div class="ring-num" style="font-size:40px">3</div>`)}</div>
+    <div class="eyebrow" style="color:var(--ember-deep);margin-bottom:8px">Momentum ignited</div>
+    <h2>Three days in.</h2>
+    <p>This is the number that matters. People who log 3 times in their first week are the ones who keep the habit. You're officially one of them.</p>
+    <div class="pills">
+      <span class="pill"><b>${c.streak}</b>day streak</span>
+      <span class="pill"><b>${c.week1}</b>/7 this week</span>
+    </div>
+    <button class="btn btn-ember" data-act="ov-close" style="margin-top:20px">Love that</button>
+  </div></div>`;
+}
+function ovWeek(w){
+  const c=compute();
+  let done=0, frozen=0, cells='';
+  for(let i=w*7;i<w*7+7;i++){
+    const within=i<=c.cur;
+    const dn=within&&c.loggedDay(i);
+    const fz=within&&!dn&&c.frozen[i];
+    if(dn) done++; if(fz) frozen++;
+    cells+=`<div class="c ${dn?'done':fz?'frozen':''}">${within?dow1(addDays(c.start,i)):''}</div>`;
+  }
+  const quote = done===7 ? 'A perfect week. Quietly remarkable.'
+    : done>=3 ? 'You showed up where it counted. That\'s how habits are built.'
+    : 'Every day you logged moved you forward. Onward.';
+  return `<div class="overlay"><div class="sheet wsum">
+    <div class="grab"></div>
+    <div class="eyebrow">Week ${w+1} recap</div>
+    <h2>Your week, gently.</h2>
+    <p class="lead">Here's how the last seven days went — no judgement, just the picture.</p>
+    <div class="wsum-week">${cells}</div>
+    <div class="wsum-row"><span class="ic">${ic('check',20)}</span><span class="tx"><b>Days you showed up</b><span>Out of seven</span></span><span class="v">${done}</span></div>
+    <div class="wsum-row"><span class="ic" style="color:var(--ember)">${ic('flame',20,1.8)}</span><span class="tx"><b>Streak right now</b><span>Current run</span></span><span class="v">${c.streak}</span></div>
+    <div class="wsum-row"><span class="ic">${ic('sprout',20)}</span><span class="tx"><b>Total days, all-time</b><span>Never resets</span></span><span class="v">${c.totalDays}</span></div>
+    ${frozen?`<div class="wsum-row"><span class="ic" style="color:var(--glacier)">${ic('snow',20)}</span><span class="tx"><b>Freezes that saved you</b><span>Missed, streak kept</span></span><span class="v">${frozen}</span></div>`:''}
+    <div class="wsum-quote">"${quote}"</div>
+    <button class="btn btn-primary" data-act="ov-close">Start a fresh week</button>
+  </div></div>`;
+}
+function ovStreak(){
+  const c=compute();
+  const pips=[];
+  for(let i=0;i<state.freezesMax;i++) pips.push(`<i class="${i<c.freezesLeft?'':'spent'}">${ic('snow',11,2)}</i>`);
+  return `<div class="overlay"><div class="sheet">
+    <div class="grab"></div>
+    <div style="display:grid;place-items:center;margin:2px 0 6px">${ringWrap(weekFills(c),150,`${c.streak>0?`<div class="ring-flame">${ic('flame',18,1.8)}</div>`:''}<div class="ring-num" style="font-size:46px">${c.streak}</div><div class="ring-cap">day streak</div>`)}</div>
+    <div class="sd-split">
+      <div class="box"><div class="n">${c.streak}</div><div class="l">Current<br>streak</div></div>
+      <div class="box"><div class="n">${c.totalDays}</div><div class="l">Total days<br>logged</div></div>
+    </div>
+    <div class="freeze-card">
+      <span class="ic">${ic('snow',26,1.8)}</span>
+      <span class="tx"><b>${c.freezesLeft} of ${state.freezesMax} freezes left</b><span>Miss a day and a freeze is used automatically — your streak stays alive. They refill each week.</span>
+        <span class="freeze-pips">${pips.join('')}</span></span>
+    </div>
+    <p class="sd-expl">Your <b>streak</b> counts the days you've shown up in a row. Your <b>total days</b> counts every day you've ever logged — it never goes down, even when a streak ends. Miss a day? A freeze covers it, so one off day doesn't undo a week of effort. <b>The goal isn't to be perfect — it's to keep coming back.</b></p>
+    <button class="btn btn-soft" data-act="ov-close" style="margin-top:18px">Got it</button>
+  </div></div>`;
+}
+function ovAdd(){
+  const d=UI.draft||{icon:'leaf',remEnabled:true,remTime:'08:00'};
+  const choices=ICON_CHOICES.map(n=>`<div class="ah-ic ${d.icon===n?'sel':''}" data-aicon="${n}">${ic(n,20)}</div>`).join('');
+  const enabled=d.remEnabled!==false;
+  return `<div class="overlay"><div class="sheet">
+    <div class="grab"></div>
+    <div class="eyebrow">New habit</div>
+    <h2 style="margin:4px 0 14px">Add a tiny habit</h2>
+    <div class="field"><label>Habit</label><input class="input" id="a-title" placeholder="e.g. Floss" value="${d.title||''}"/></div>
+    <div class="field"><label>The tiny version</label><input class="input" id="a-tiny" placeholder="e.g. one tooth (really)" value="${d.tiny||''}"/></div>
+    <div class="field"><label>Icon</label><div class="ah-grid">${choices}</div></div>
+    <div class="field"><label>Reminder</label>
+      <div class="rem-card">
+        <div class="rem-row">
+          <span class="rem-ic">${ic('bell',20)}</span>
+          <span class="rem-tx"><b>Daily nudge</b><span>A single reminder for this habit</span></span>
+          <label class="switch"><input type="checkbox" id="a-rem" ${enabled?'checked':''}/><span class="track"></span><span class="knob"></span></label>
+        </div>
+        <div class="rem-row" ${enabled?'':'style="opacity:.4;pointer-events:none"'}>
+          <span class="rem-ic">${ic('clock',20)}</span>
+          <span class="rem-tx"><b>Nudge me at</b><span>Time specific to this habit</span></span>
+          <input class="time-input" type="time" id="a-time" value="${d.remTime||'08:00'}"/>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn btn-soft" data-act="ov-close">Cancel</button>
+      <button class="btn btn-primary" data-act="add-save">Add habit</button>
+    </div>
+  </div></div>`;
+}
+function ovHabitEdit(){
+  const h=state.habits.find(x=>x.id===UI.editId); if(!h) return '';
+  const d=UI.draft||{};
+  const enabled = d.remEnabled!==false;
+  const choices=ICON_CHOICES.map(n=>`<div class="ah-ic ${d.icon===n?'sel':''}" data-aicon="${n}">${ic(n,20)}</div>`).join('');
+  return `<div class="overlay"><div class="sheet">
+    <div class="grab"></div>
+    <div class="eyebrow">Edit habit</div>
+    <h2 style="margin:4px 0 14px">Set your nudge</h2>
+    <div class="field"><label>Habit</label><input class="input" id="e-title" value="${d.title||''}"/></div>
+    <div class="field"><label>The tiny version</label><input class="input" id="e-tiny" value="${d.tiny||''}"/></div>
+    <div class="field"><label>Icon</label><div class="ah-grid">${choices}</div></div>
+    <div class="field"><label>Reminder for this habit</label>
+      <div class="rem-card">
+        <div class="rem-row">
+          <span class="rem-ic">${ic('bell',20)}</span>
+          <span class="rem-tx"><b>Daily nudge</b><span>Turn this habit's reminder on or off</span></span>
+          <label class="switch"><input type="checkbox" id="e-rem" ${enabled?'checked':''}/><span class="track"></span><span class="knob"></span></label>
+        </div>
+        <div class="rem-row" ${enabled?'':'style="opacity:.4;pointer-events:none"'}>
+          <span class="rem-ic">${ic('clock',20)}</span>
+          <span class="rem-tx"><b>Nudge me at</b><span>A time that fits this habit</span></span>
+          <input class="time-input" type="time" id="e-time" value="${d.remTime||'08:00'}"/>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn btn-soft" data-act="ov-close">Cancel</button>
+      <button class="btn btn-primary" data-act="edit-save">Save</button>
+    </div>
+    ${state.habits.length>1?`<button class="btn btn-ghost" data-act="edit-delete" style="margin-top:6px;color:var(--ember-deep)">Remove this habit</button>`:''}
+  </div></div>`;
+}
+/* ---------- confetti ---------- */
+function burst(){
+  const host=$('.overlay'); if(!host) return;
+  const c=document.createElement('div'); c.className='confetti';
+  const cols=['#5B45F0','#FF6A3D','#8A45DF','#1FA9E0','#FFB48F'];
+  for(let i=0;i<18;i++){
+    const s=document.createElement('i');
+    s.style.left=Math.random()*100+'%';
+    s.style.background=cols[i%cols.length];
+    s.style.animationDuration=(1.5+Math.random()*1.4)+'s';
+    s.style.animationDelay=(Math.random()*.4)+'s';
+    s.style.transform='rotate('+(Math.random()*180)+'deg)';
+    c.appendChild(s);
+  }
+  host.appendChild(c);
+  setTimeout(()=>c.remove(),3400);
+}
+
+/* ---------- toast ---------- */
+let toastT=null;
+function toast(msg){
+  const el=$('#toast'); el.innerHTML=`<span class="tic">${ic('snow',16,2.4)}</span>${msg}`;
+  el.classList.add('show'); clearTimeout(toastT);
+  toastT=setTimeout(()=>el.classList.remove('show'),2400);
+}
+
+/* ===========================================================================
+   ACTIONS
+=========================================================================== */
+function logHabit(id){
+  const fromFirst=UI.screen==='firstlog';
+  const c=compute(); const k=id+'|'+c.curDate;
+  if(state.logs[k]) return;
+  state.logs[k]=true;
+  UI.flash=id;
+  const firstEver=!state.seen.firstLog;
+  if(firstEver) state.seen.firstLog=true;
+  if(fromFirst) UI.screen='app';
+  if(firstEver) OQ.push('firstwin');
+  save(); render(); runTriggers();
+}
+function runTriggers(){
+  const c=compute();
+  if(c.week1>=3 && !state.seen.activated){ state.seen.activated=true; OQ.push('activate'); }
+  const maxWeek=Math.floor(c.cur/7);
+  for(let w=0; w<=maxWeek; w++){
+    const last=w*7+6;
+    const weekDone = c.cur>last || (c.cur>=last && c.loggedDay(last));
+    if(weekDone && !state.weeksShown.includes(w)){ state.weeksShown.push(w); OQ.push('week:'+w); }
+  }
+  save(); renderOverlay();
+}
+function closeTopOverlay(){
+  if(OQ.length){ OQ.shift(); }
+  else { UI.overlay=null; UI.draft=null; }
+  render();
+}
+function advanceDay(){ state.advance=cursor()+1; save(); render(); runTriggers(); }
+function skipDay(){
+  const c0=compute();
+  // if today is already logged, step two days so one genuine off-day is created (and frozen);
+  // otherwise leave today unlogged and step one — today becomes the frozen off-day.
+  state.advance = cursor() + (c0.loggedDay(c0.cur) ? 2 : 1);
+  save(); render(); runTriggers();
+  const c=compute();
+  if(c.frozen[c.cur-1]) toast('Day skipped — a freeze kept your streak');
+  else toast('Day skipped');
+}
+function jumpWeek(){
+  const start=state.startISO, h=state.habits[0];
+  for(let i=0;i<7;i++){ state.logs[h.id+'|'+addDays(start,i)]=true; }
+  state.advance=6; state.seen.activated=true; save(); render(); runTriggers();
+}
+
+/* ---------- onboarding flow ---------- */
+function obNext(){
+  const step=UI.obStep;
+  if(step===0){ UI.obStep=1; render(); return; }
+  if(step===1){
+    if(UI.draft.id==='custom'){
+      const t=$('#f-title'), ti=$('#f-tiny');
+      UI.draft.title=(t&&t.value.trim())||'My habit';
+      UI.draft.tiny=(ti&&ti.value.trim())||'keep it tiny';
+    }
+    UI.obStep=2; render(); return;
+  }
+  const en=$('#f-rem'), tm=$('#f-time');
+  const r=(UI.draft&&UI.draft.reminder)||{enabled:true,time:'08:00'};
+  const remEnabled = en?en.checked:(r.enabled!==false);
+  const remTime = (tm&&tm.value)||r.time||'08:00';
+  const d=UI.draft;
+  const habit={ id:'h'+Date.now().toString(36), title:d.title, tiny:d.tiny, cue:d.cue||'', icon:d.icon, remEnabled, remTime };
+  state.habits=[habit];
+  state.onboarded=true;
+  state.startISO=iso(new Date());
+  state.startTs=Date.now();
+  state.tab='today';
+  save();
+  UI.screen='firstlog'; UI.draft=null; render();
+}
+
+/* ===========================================================================
+   EVENTS (delegation)
+=========================================================================== */
+document.addEventListener('click',e=>{
+  const logT=e.target.closest('[data-log]');
+  if(logT){ logHabit(logT.getAttribute('data-log')); return; }
+  const tmpl=e.target.closest('[data-tmpl]');
+  if(tmpl){ const id=tmpl.getAttribute('data-tmpl'); const t=TEMPLATES.find(x=>x.id===id);
+    UI.draft=Object.assign({}, UI.draft||{}, { id:t.id, title:t.title==='Something else'?'':t.title, tiny:t.title==='Something else'?'':t.tiny, icon:t.icon }); render(); return; }
+  const cue=e.target.closest('[data-cue]');
+  if(cue){ const v=cue.getAttribute('data-cue'); UI.draft.cue=UI.draft.cue===v?'':v; render(); return; }
+  const aicon=e.target.closest('[data-aicon]');
+  if(aicon){ UI.draft=Object.assign({},UI.draft||{},{icon:aicon.getAttribute('data-aicon')}); render(); return; }
+  const rp=e.target.closest('[data-rempreset]');
+  if(rp){ UI.draft=UI.draft||{}; UI.draft.reminder=UI.draft.reminder||{enabled:true,time:'08:00'}; UI.draft.reminder.time=rp.getAttribute('data-rempreset'); UI.draft.reminder.enabled=true; render(); return; }
+  const ed=e.target.closest('[data-edit]');
+  if(ed){ const hh=state.habits.find(x=>x.id===ed.getAttribute('data-edit')); if(hh){ UI.editId=hh.id; UI.draft={title:hh.title,tiny:hh.tiny,icon:hh.icon,remEnabled:hh.remEnabled,remTime:hh.remTime}; UI.overlay='habitedit'; render(); } return; }
+  const a=e.target.closest('[data-act]'); if(!a) return;
+  switch(a.getAttribute('data-act')){
+    case 'begin': UI.screen='onboard'; UI.obStep=0; UI.draft={}; render(); break;
+    case 'ob-next': obNext(); break;
+    case 'ob-back': UI.obStep=Math.max(0,UI.obStep-1); render(); break;
+    case 'skip-firstlog': UI.screen='app'; render(); break;
+    case 'streak': UI.overlay='streak'; render(); break;
+    case 'add': UI.draft={icon:'leaf',remEnabled:true,remTime:'08:00'}; UI.overlay='add'; render(); break;
+    case 'add-save': {
+      const t=$('#a-title'), ti=$('#a-tiny'), rm=$('#a-rem'), tm=$('#a-time');
+      const title=(t&&t.value.trim())||'New habit';
+      const tiny=(ti&&ti.value.trim())||'keep it tiny';
+      state.habits.push({id:'h'+Date.now().toString(36),title,tiny,cue:'',icon:(UI.draft&&UI.draft.icon)||'leaf',remEnabled:rm?rm.checked:true,remTime:(tm&&tm.value)||'08:00'});
+      save(); UI.overlay=null; UI.draft=null; render(); toast('Habit added'); break;
+    }
+    case 'edit-save': {
+      const h=state.habits.find(x=>x.id===UI.editId);
+      if(h){ const d=UI.draft||{};
+        h.title=(d.title||'').trim()||h.title;
+        h.tiny=(d.tiny||'').trim()||h.tiny;
+        h.icon=d.icon||h.icon;
+        h.remEnabled=!!d.remEnabled;
+        h.remTime=d.remTime||h.remTime; }
+      UI.overlay=null; UI.draft=null; UI.editId=null; save(); render(); toast('Habit updated'); break;
+    }
+    case 'edit-delete': {
+      const id=UI.editId;
+      state.habits=state.habits.filter(x=>x.id!==id);
+      for(const k in state.logs){ if(k.split('|')[0]===id) delete state.logs[k]; }
+      UI.overlay=null; UI.draft=null; UI.editId=null; save(); render(); toast('Habit removed'); break;
+    }
+    case 'tab-settings': state.tab='settings'; save(); render(); break;
+    case 'd-next': advanceDay(); break;
+    case 'd-skip': skipDay(); break;
+    case 'd-week': jumpWeek(); break;
+    case 'ov-close': closeTopOverlay(); break;
+  }
+});
+/* tap dimmed backdrop to dismiss non-celebration sheets */
+document.addEventListener('click',e=>{
+  if(e.target.classList && e.target.classList.contains('overlay')){
+    const id=OQ[0]||UI.overlay;
+    if(id==='streak'||id==='add'||id==='habitedit') closeTopOverlay();
+  }
+});
+/* reminder toggles */
+document.addEventListener('change',e=>{
+  if(e.target.id==='f-rem'){ UI.draft.reminder=UI.draft.reminder||{enabled:true,time:'08:00'}; UI.draft.reminder.enabled=e.target.checked; render(); }
+  if(e.target.id==='f-time'){ UI.draft.reminder=UI.draft.reminder||{enabled:true,time:'08:00'}; UI.draft.reminder.time=e.target.value; }
+  if(e.target.id==='a-rem'){ UI.draft=UI.draft||{}; UI.draft.remEnabled=e.target.checked; render(); }
+  if(e.target.id==='a-time'){ UI.draft=UI.draft||{}; UI.draft.remTime=e.target.value; }
+  if(e.target.id==='e-rem'){ UI.draft=UI.draft||{}; UI.draft.remEnabled=e.target.checked; render(); }
+  if(e.target.id==='e-time'){ UI.draft=UI.draft||{}; UI.draft.remTime=e.target.value; }
+});
+/* keep text inputs in draft as you type (so re-renders don't lose them) */
+document.addEventListener('input',e=>{
+  if(e.target.id==='f-title') UI.draft.title=e.target.value;
+  if(e.target.id==='f-tiny')  UI.draft.tiny=e.target.value;
+  if(e.target.id==='a-title'){ UI.draft=UI.draft||{}; UI.draft.title=e.target.value; }
+  if(e.target.id==='a-tiny'){  UI.draft=UI.draft||{}; UI.draft.tiny=e.target.value; }
+  if(e.target.id==='e-title'){ UI.draft=UI.draft||{}; UI.draft.title=e.target.value; }
+  if(e.target.id==='e-tiny'){  UI.draft=UI.draft||{}; UI.draft.tiny=e.target.value; }
+});
+
+/* nav */
+$$('#nav button').forEach(b=>b.addEventListener('click',()=>{ state.tab=b.getAttribute('data-tab'); save(); render(); }));
+function syncNav(){ $$('#nav button').forEach(b=>b.classList.toggle('on', b.getAttribute('data-tab')===state.tab)); }
+function setNavIcons(){
+  const map={today:'home',progress:'chart',settings:'user'};
+  $$('#nav button').forEach(b=>{ const s=b.querySelector('.navic'); if(s) s.innerHTML=ic(map[b.getAttribute('data-tab')],20,2); });
+}
+
+/* ---------- boot ---------- */
+setNavIcons();
+render();
+</script>
+</body>
+</html>
